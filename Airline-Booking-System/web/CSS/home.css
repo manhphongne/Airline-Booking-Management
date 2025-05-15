@@ -188,6 +188,8 @@
     font-size: 17px;
 }
 
+
+
 .login-button {
     border: solid 2px var(--primary-blue);
     background-color: white;
@@ -195,103 +197,7 @@
     font-weight: bold;
 }
 
-.register-button {
-    border: solid 2px var(--primary-blue);
-    background-color: var(--primary-blue);
-    color: white;
-    padding: 5px 10px;
-    font-weight: bold;
-}
-
-.feature-card {
-    transition: transform 0.3s;
-}
-
-.feature-card:hover {
-    transform: translateY(-5px);
-}
-
-.custom-yellow-btn {
-    background-color: var(--yellow-btn);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.15rem;
-    font-weight: 700;
-    padding: 16px 0;
-    box-shadow: 0 2px 8px rgba(255, 87, 51, 0.08);
-    transition: background 0.2s;
-}
-
-.custom-yellow-btn:hover {
-    background-color: var(--yellow-btn-hover);
-}
-
-.passenger-dropdown,
-.location-dropdown {
-    width: 100%;
-}
-
-.location-suggestion {
-    cursor: pointer;
-    padding: 8px;
-}
-
-.location-suggestion:hover {
-    background-color: #f0f0f0;
-}
-
-/*css login register*/
-.login-modal .modal-content,
-.register-modal .modal-content {
-    background-color: var(--background-light);
-}
-
-.login-modal .modal-body,
-.register-modal .modal-body {
-    padding: 2rem;
-}
-
-.login-modal h2,
-.register-modal h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 2rem;
-}
-
-.login-modal .form-control,
-.register-modal .form-control {
-    margin-bottom: 1rem;
-}
-
-.login-modal .btn-primary,
-.register-modal .btn-primary {
-    background-color: #4285f4;
-    border: none;
-    width: 100%;
-    padding: 0.75rem;
-}
-
-.login-modal .btn-primary:hover,
-.register-modal .btn-primary:hover {
-    background-color: #3267d6;
-}
-
-.login-modal .btn-google,
-.register-modal .btn-google {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    color: #333;
-    text-decoration: none;
-    margin-top: 1rem;
-}
-
-/*CSS login register done*/
-
-
-
+/*CSS of booking section*/
 .booking-section {
     margin-top: 70px;
     margin-bottom: 30px;
@@ -407,3 +313,103 @@
         max-width: 100%;
     }
 }
+
+/*End CSS of booking section */
+
+ .modal-content {
+    background: #eaf6ff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    border: none;
+}
+
+.register-modal h2{
+    margin-bottom: 30px;
+}
+
+.login-modal h2{
+     margin-bottom: 20px;
+}
+.register-modal .modal-body {
+    padding: 2.5rem 2rem 2rem 2rem;
+}
+
+.btn-google .google-icon {
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+.login-modal .btn-google .google-icon {
+    width: 22px;
+    height: 22px;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+ .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #444;
+    border: 1.5px solid #dadce0;
+    border-radius: 8px;
+    padding: 12px 0;
+    width: 220px;
+    margin: 1.2rem auto 0 auto;
+    font-weight: 600;
+    font-size: 1.08rem;
+    box-shadow: 0 2px 8px rgba(60,64,67,0.08);
+    transition: box-shadow 0.18s, border-color 0.18s, color 0.18s;
+    letter-spacing: 0.02em;
+    gap: 12px;
+    cursor: pointer;
+    text-decoration: none;
+}
+ 
+ .register-modal button[type="submit"] {
+    border-radius: 10px;
+    padding: 14px 0;
+    font-size: 1.13rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #2563eb 60%, #42a5f5 100%);
+    border: none;
+    color: #fff;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    width: 100%;
+    letter-spacing: 0.03em;
+}
+ 
+ .login-modal button[type="submit"] {
+    border-radius: 10px;
+    padding: 14px 0;
+    font-size: 1.13rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #2563eb 60%, #42a5f5 100%);
+    border: none;
+    color: #fff;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    width: 100%;
+    letter-spacing: 0.03em;
+}
+
+.login-modal .btn-google{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   width: 60%;
+   padding-left: 8px;
+}
+
+.google-note{
+   color:  #6c757d;
+}
+

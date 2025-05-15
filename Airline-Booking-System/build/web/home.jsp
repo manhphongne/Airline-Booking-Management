@@ -58,7 +58,7 @@
                 <button class="btn btn-outline-primary me-2" type="button" data-bs-toggle="modal"
                         data-bs-target="#loginModal">Đăng nhập</button>
                 <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#registerModal" id="registerBtn"
-                        style="padding: 8px 20px;">Đăng ký</button>
+                        style="padding: 8px 22px; color: white">Đăng ký</button>
                 <% } %>
             </div>
         </header>
@@ -77,20 +77,20 @@
                     <div class="modal-body text-center">
                         <h2>Đăng ký</h2>
                         <form method="POST" action="register" id="registerForm">
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
+                            <div class="row mb-4">
+                                <div class="col-md-6 ">
                                     <input type="text" id="lastName" class="form-control form-control-lg"
                                            placeholder="Họ" name="lastName" value="${param.lastName}" required/>
                                     <c:if test="${not empty errors.firstName}">
                                         <p class="error">${errors.firstName}</p>
                                     </c:if>
                                 </div>
-                                <div class="col-md-6 mb-4">
+                                <div class="col-md-6">
                                     <input type="text" id="firstName" class="form-control form-control-lg"
                                            placeholder="Tên" name="firstName" value="${param.firstName}" required/>
                                 </div>
                             </div>
-                            <div class="form-outline mb-4">
+                            <div class="form-outline mb-4 mt-4">
                                 <input type="email" id="email" class="form-control form-control-lg"
                                        placeholder="Vui lòng nhập email" name="email" value="${param.email}" required/>
                                 <c:if test="${not empty errors.email}">
@@ -109,10 +109,12 @@
                                        placeholder="Xác nhận mật khẩu" name="confirmPass" required onkeyup="checkPassword()"/>
                                 <p class="error" id="errorPassword"></p>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-block mb-4" style="margin-top: 30px">Đăng ký</button>
-                            <p class="mt-4">hoặc đăng ký bằng:</p>
+                            <button type="submit" class="btn btn-primary btn-block mb-3">Đăng ký</button>
+                            <div class="register-divider"></div>
+                            <p class="google-note">Nếu bạn đã có tài khoản Google</p>
                             <a href="#" class="btn-google">
-                                <i class="fab fa-google"></i> Google
+                                <img src="Image/images.jpg" alt="Google" class="google-icon">
+                                Đăng ký với Google
                             </a>
 
                         </form>
@@ -139,10 +141,6 @@
                     errorText.innerHTML = "";
                 }
             }
-
-
-
-
         </script>
 
 
@@ -163,7 +161,7 @@
                     <div class="modal-body text-center">
                         <h2>Đăng nhập</h2>
                         <form method="POST" action="Login">
-                            <div class="form-outline mb-4">
+                            <div class="form-outline mb-4 mt-2">
                                 <input type="email" placeholder="Email" id="typeEmailX-2"
                                        class="form-control form-control-lg" name="email" />
                             </div>
@@ -172,9 +170,11 @@
                                        class="form-control form-control-lg" name="password"/>
                             </div>
                             <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-                            <p class="mt-4">hoặc đăng nhập bằng:</p>
+                            <div class="register-divider"></div>
+                            <p class="google-note mb-1">Hoặc</p>
                             <a href="#" class="btn-google">
-                                <i class="fab fa-google"></i> Google
+                                <img src="Image/images.jpg" alt="Google" class="google-icon">
+                                Đăng nhập với Google
                             </a>
                         </form>
                     </div>
