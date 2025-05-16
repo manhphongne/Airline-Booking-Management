@@ -2,6 +2,7 @@
 
 package dao;
 
+import java.util.Optional;
 import model.UserEntity;
 
 public interface UserDAO extends BaseDAO<UserEntity>{
@@ -10,7 +11,7 @@ public interface UserDAO extends BaseDAO<UserEntity>{
      * @param email
      * @return a userEntity obejct
      */
-    UserEntity findByEmail(String email);
+    Optional<UserEntity> findByEmail(String email);
     
-    UserEntity findByEmailAndPassword(String email, String password);
+    Optional<UserEntity> findByEmailAndPassword(String email, String password);
 }

@@ -12,6 +12,11 @@ public interface BaseDAO<T> {
     T findByID(Long id);
 
     /**
+     * get all urser from db
+     * @return 
+     */
+    List<T> findAll();
+    /**
      * insert new entity to database
      * @param entity
      * @return true if insert successfull

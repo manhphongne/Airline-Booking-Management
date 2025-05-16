@@ -1,5 +1,7 @@
 package service;
 
+import dto.UserRegisterRequest;
+import java.util.Optional;
 import model.UserEntity;
 
 public interface UserService {
@@ -9,7 +11,7 @@ public interface UserService {
      *
      * @return id of new user
      */
-    public long register(UserEntity user);
+    public long register(UserRegisterRequest user);
 
     /**
      * get user entity by id
@@ -21,7 +23,7 @@ public interface UserService {
 
     boolean isEmailExist(String email);
 
-    public UserEntity getUserbyEmail(String email);
+    public Optional<UserEntity> getUserbyEmail(String email);
 
     public boolean login(UserEntity u);
 

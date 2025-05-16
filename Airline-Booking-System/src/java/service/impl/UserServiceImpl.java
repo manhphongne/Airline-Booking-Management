@@ -1,14 +1,16 @@
 package service.impl;
 
-import enums.Role;
 import controller.usercontroller.UserRegister;
 import dao.UserDAOImpl;
+import dto.UserRegisterRequest;
+import enums.Role;
+import enums.UserStatus;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.logging.Logger;
 import model.UserEntity;
 import service.UserService;
 import util.PasswordEncryption;
-import validator.ValidatorUtils;
 
 public class UserServiceImpl implements UserService {
 
@@ -20,24 +22,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public long register(UserEntity userEntity) {
+    public long register(UserRegisterRequest userRq) {
         // check email exist
 
-        logger.info("after check exist: " + userEntity.getEmail());
-
-        if (isEmailExist(userEntity.getEmail())) {
-            return -1;
-        }
-        logger.info("before check exist: " + userEntity.getEmail());
+        UserEntity userEntity = new UserEntity();
 
         //userEntity.setPassword(PasswordEncryption.doSha256(userEntity.getPassword()));
+        userEntity.setFirstName(userRq.getFirstName());
+        userEntity.setLastName(userRq.getLastName());
+        userEntity.setEmail(userRq.getEmail());
+        userEntity.setPassword(PasswordEncryption.doSha256(userRq.getPassword()));
+
         userEntity.setRole(Role.CUSTOMER);
         userEntity.setCreateAt(LocalDateTime.now());
         userEntity.setUpdatedAt(LocalDateTime.now());
         userEntity.setLastLogin(LocalDateTime.now());
-
-        userDAO.insert(userEntity);
-
+        userEntity.setStatus(UserStatus.PENDING);
+        
+        logger.info("before ins service: " + userEntity.toString());
+        boolean result = userDAO.insert(userEntity);
+        logger.info("Insert result: " + result);
+        logger.info("after ins service: " + userEntity.toString());
         return userEntity.getUserId();
     }
 
@@ -46,7 +51,6 @@ public class UserServiceImpl implements UserService {
         return userDAO.isEmailExist(email);
     }
 
-    
     @Override
     public UserEntity getUserByID(long id) {
         return null;
@@ -54,7 +58,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserEntity getUserbyEmail(String email) {
+    public Optional<UserEntity> getUserbyEmail(String email) {
         return userDAO.findByEmail(email);
     }
 
@@ -63,14 +67,11 @@ public class UserServiceImpl implements UserService {
 
         boolean login = false;
 
-//        UserEntity user = userDAO.findByEmailAndPassword(u.getEmail(), PasswordEncryption.doSha256(u.getPassword()));
-        UserEntity user = userDAO.findByEmailAndPassword(u.getEmail(), u.getPassword());
-        if (user != null) {
+        Optional<UserEntity> user = userDAO.findByEmailAndPassword(u.getEmail(), PasswordEncryption.doSha256(u.getPassword()));
+        if (user.isPresent()) {
             login = true;
         }
-
         return login;
     }
-
 
 }

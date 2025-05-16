@@ -9,10 +9,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
-import model.UserEntity;
 import java.util.logging.Logger;
 import service.UserService;
 import service.impl.UserServiceImpl;
+import util.ResourseMSG;
 import validator.ValidatorUtils;
 
 /**
@@ -36,69 +36,66 @@ public class UserRegister extends HttpServlet {
         String firstName = req.getParameter("firstName");
         String email = req.getParameter("email");
         String password = req.getParameter("password");
-        String cornfirmPass = req.getParameter("cornfirmPass");
+        String rePassword = req.getParameter("rePassword");
 
         //a list about infor of error
         Map<String, String> errors = new HashMap<>();
 
         if (ValidatorUtils.isStringEmpty(lastName) || ValidatorUtils.isStringEmpty(firstName)) {
-            errors.put("firstName", "Vui lòng không để trống.");
+            errors.put("firstName", ResourseMSG.IS_EMPTY);
         }
 
         if (!email.matches("^[A-Za-z0-9+_.-]{1,64}@[A-Za-z0-9.-]{1,255}\\.[A-Za-z]{2,6}$")) {
-            errors.put("email", "Email không hợp lệ.");
+            errors.put("email", ResourseMSG.ERRORS_EMAIL_INVALID);
         }
 
-        if (password.length() < 6 || password.length() > 50) {
-            errors.put("password", "Mật khẩu phải từ 6-50 ký tự.");
+        if (password.length() < 6) {
+            errors.put("password", ResourseMSG.ERRORS_PASSWORD);
         }
 
-        if (!checkPasswordAndRePassword(password, cornfirmPass)) {
-            errors.put("rePassword", "Mật khẩu xác nhận không khớp.");
+        if (!checkPasswordAndRePassword(password, rePassword)) {
+            errors.put("rePassword", ResourseMSG.ERRORS_RE_PASSWORD);
+        }
+
+        if (userService.isEmailExist(email)) {
+            errors.put("email", ResourseMSG.ERRORS_EMAIL_EXIST);
         }
 
         String url = "";
         // register successfull
         if (errors.isEmpty()) {
-            
-            UserEntity u = new UserEntity();
-            
-            UserRegisterRequest userRequest = new UserRegisterRequest(email, password, firstName, lastName);
-            
-            u.setEmail(email);
-            u.setPassword(password);
-            u.setFirstName(firstName);
-            u.setLastName(lastName);
 
-            
-            
+            UserRegisterRequest userRequest = new UserRegisterRequest(email.trim(), password, firstName.trim(), lastName.trim());
+
             try {
-                long result = userService.register(u);
-                if(result!=-1){
-                    
+                long userId = userService.register(userRequest);
+
+                if (userId > 0) {
+                    req.setAttribute("successRegisterMsg", ResourseMSG.SUCCESS_REGISTER_MSG);
+                    url = "home.jsp";
+                } else {
+                    errors.put("registerFailed", ResourseMSG.FAILED_REGISTER);
+                    url = "home.jsp";
                 }
             } catch (Exception e) {
+                e.printStackTrace();
+                url = "home.jsp";
             }
 
-            url = "home.jsp";
-            req.getRequestDispatcher(url).forward(req, resp);
-
-            logger.info("email: " + email + " registed successfull, id: " + u.getUserId());
-
         } else {
-            req.setAttribute("errors", errors);
-            logger.info("email: " + email + " can not register");
+            errors.put("registerFailed", ResourseMSG.FAILED_REGISTER);
             url = "home.jsp";
-            req.getRequestDispatcher(url).forward(req, resp);
         }
+        req.setAttribute("errors", errors);
+        req.getRequestDispatcher(url).forward(req, resp);
     }
 
     /**
-     * check password
+     * check re-password
      *
      * @param pass
      * @param confPass
-     * @return true if password and confirm password is same
+     * @return true if password and re-password is same
      */
     public boolean checkPasswordAndRePassword(String pass, String confPass) {
         return pass.equals(confPass);

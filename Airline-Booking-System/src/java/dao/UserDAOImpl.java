@@ -1,16 +1,19 @@
 package dao;
 
-import enums.Gender;
-import enums.Role;
 import controller.usercontroller.UserRegister;
 import database.DBContext;
-import java.util.List;
-import model.UserEntity;
+import enums.Gender;
+import enums.Role;
+import enums.UserStatus;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.function.Supplier;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.UserEntity;
 
 public class UserDAOImpl implements UserDAO {
 
@@ -34,7 +37,22 @@ public class UserDAOImpl implements UserDAO {
             ps.setLong(1, id);
 
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
+
+                long user_id = rs.getLong("user_id");
+
+                LocalDate dob = rs.getTimestamp("date_of_birth") != null
+                        ? rs.getTimestamp("date_of_birth").toLocalDateTime().toLocalDate()
+                        : null;
+
+                Gender gender = rs.getString("gender") != null
+                        ? Gender.valueOf(rs.getString("gender"))
+                        : null;
+
+                String phone = rs.getString("phone");
+                String nationality = rs.getString("nationality");
+
                 user = new UserEntity(
                         rs.getLong("user_id"),
                         rs.getString("email"),
@@ -42,15 +60,17 @@ public class UserDAOImpl implements UserDAO {
                         Role.valueOf(rs.getString("role")),
                         rs.getString("first_name"),
                         rs.getString("last_name"),
-                        rs.getTimestamp("date_of_birth").toLocalDateTime().toLocalDate(),
-                        Gender.valueOf(rs.getString("gender")),
-                        rs.getString("phone"),
-                        rs.getString("nationality"),
+                        dob,
+                        gender,
+                        phone,
+                        nationality,
                         rs.getTimestamp("create_at").toLocalDateTime(),
                         rs.getTimestamp("update_at").toLocalDateTime(),
-                        rs.getTimestamp("last_login").toLocalDateTime());
+                        rs.getTimestamp("last_login").toLocalDateTime(),
+                        UserStatus.valueOf(rs.getString("account_status")
+                        ));
+                rs.close();
             }
-            rs.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,15 +78,16 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public boolean insert(UserEntity u) {
+    public boolean insert(UserEntity u
+    ) {
 
         // Step 1: create a connection to database
         Connection conn = dbContext.getConn();
         try {
             // Step 2: create statement object
             String sql = "INSERT INTO [User] (email, password, role, first_name, "
-                    + "last_name, create_at, update_at, last_login) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                    + "last_name, create_at, update_at, last_login, account_status) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
 
             ps.setString(1, u.getEmail());
@@ -77,18 +98,22 @@ public class UserDAOImpl implements UserDAO {
             ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
             ps.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
             ps.setTimestamp(8, Timestamp.valueOf(LocalDateTime.now()));
+            ps.setString(9, u.getStatus().toString());
 
+            logger.info("before ins userDao: " + u.toString());
             // Step 3: execute SQL statement
             if (ps.executeUpdate() == 1) { // executeUpdate tra ve so luong hang bi anh huong
-                logger.info("Luu thanh cong:" + u.toString());
+                logger.info("after ins userDao: " + u.toString());
                 return true;
             }
             // Step 4: close connection
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, "Error Code: " + ex.getErrorCode());
         } finally {
             try {
-                conn.close();
+                if (conn != null) {
+                    conn.close();
+                }
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
@@ -97,12 +122,13 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public UserEntity findByEmail(String email) {
+    public Optional<UserEntity> findByEmail(String email
+    ) {
         //step 1: get connection
         //step 2: create preparedStatement object
         //step 3: excute SQL
         //step 4: close connection
-        UserEntity u = null;
+        UserEntity u;
         try {
             Connection conn = dbContext.getConn();
             String sql = "select * from [User] where email = ?";
@@ -114,9 +140,6 @@ public class UserDAOImpl implements UserDAO {
             if (rs.next()) {
 
                 long user_id = rs.getLong("user_id");
-                if (rs.wasNull()) {
-                    return null;
-                }
 
                 LocalDate dob = rs.getTimestamp("date_of_birth") != null
                         ? rs.getTimestamp("date_of_birth").toLocalDateTime().toLocalDate()
@@ -142,18 +165,18 @@ public class UserDAOImpl implements UserDAO {
                         nationality,
                         rs.getTimestamp("create_at").toLocalDateTime(),
                         rs.getTimestamp("update_at").toLocalDateTime(),
-                        rs.getTimestamp("last_login").toLocalDateTime());
-
+                        rs.getTimestamp("last_login").toLocalDateTime(),
+                        UserStatus.valueOf(rs.getString("account_status")
+                        ));
+                rs.close();
+                conn.close();
+                return Optional.of(u);
             }
 
-            logger.info("\nTìm kiếm thành công bằng email:" + u.toString());
-            rs.close();
-            conn.close();
-
         } catch (SQLException e) {
-            logger.info((Supplier<String>) e);
+            logger.log(Level.SEVERE, "Lỗi khi tìm email: " + e.getMessage(), e);
         }
-        return u;
+        return Optional.empty();
     }
 
     public boolean isEmailExist(String email) {
@@ -168,7 +191,7 @@ public class UserDAOImpl implements UserDAO {
             }
             rs.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Lỗi khi kiểm tra email tồn tại: " + e.getMessage(), e);
         }
         return isExist;
     }
@@ -189,7 +212,7 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
-    public UserEntity findByEmailAndPassword(String email, String password) {
+    public Optional<UserEntity> findByEmailAndPassword(String email, String password) {
 
         /**
          * Step 1: create a connection to database Step 2: Create a
@@ -203,15 +226,58 @@ public class UserDAOImpl implements UserDAO {
             ps.setString(1, email);
             ps.setString(2, password);
             ResultSet rs = ps.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 userEntity = new UserEntity();
                 userEntity.setEmail(rs.getString("email"));
                 userEntity.setPassword(rs.getString("password"));
             }
+            return Optional.of(userEntity);
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return userEntity;
+        return Optional.empty();
+    }
+
+    @Override
+    public List<UserEntity> findAll() {
+        String sql = "select * from [User]";
+        List<UserEntity> users = new LinkedList<>();
+        try {
+            //step1: create connection
+            //step2: create a preparedStatement and excute
+            //step3: close connection
+
+            Connection conn = dbContext.getConn();
+            PreparedStatement ps = conn.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                UserEntity user = new UserEntity();
+                user = new UserEntity(
+                        rs.getLong("user_id"),
+                        rs.getString("email"),
+                        rs.getString("password"),
+                        Role.valueOf(rs.getString("role")),
+                        rs.getString("first_name"),
+                        rs.getString("last_name"),
+                        rs.getTimestamp("date_of_birth") != null ? rs.getTimestamp("date_of_birth").toLocalDateTime().toLocalDate() : null,
+                        rs.getString("[gender]") !=null ? Gender.valueOf(rs.getString("[gender]")) : null,
+                        rs.getString("phone"),
+                        rs.getString("[nationality]"),
+                        rs.getTimestamp("[create_at]") != null ? rs.getTimestamp("[create_at]").toLocalDateTime(): null,
+                        rs.getTimestamp("[update_at]") != null ? rs.getTimestamp("[update_at]").toLocalDateTime() : null,
+                        rs.getTimestamp("[last_login]") != null ? rs.getTimestamp("[last_login]").toLocalDateTime() : null,
+                        UserStatus.valueOf(rs.getString("account_status")
+                        ));
+                users.add(user);
+            }
+            ps.close();
+            conn.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 }

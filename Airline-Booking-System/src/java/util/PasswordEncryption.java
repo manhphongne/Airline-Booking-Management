@@ -46,6 +46,6 @@ public class PasswordEncryption {
     }
     
     public static void main(String[] args) {
-        System.out.println(PasswordEncryption.doSha256("abc"));
+        System.out.println(PasswordEncryption.doSha256("123456"));
     }
 }
